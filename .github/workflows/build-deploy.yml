@@ -189,8 +189,8 @@ jobs:
       run: |
           mkdir -p ~/.ssh
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          cat $GATEWAY_SSH_KEY > /tmp/gateway.key
-          cat $DEPLOYMENT_SSH_KEY > /tmp/deployment.key
+          cat - <<< $GATEWAY_SSH_KEY > /tmp/gateway.key
+          cat - <<< $DEPLOYMENT_SSH_KEY > /tmp/deployment.key
 
     - name: Deploy Artemis WAR artifact
       env:
