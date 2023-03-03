@@ -207,6 +207,7 @@ jobs:
           DEPLOYMENT_USER: "${{ secrets.DEPLOYMENT_USER }}"
           WAR_FILE: ./${{steps.artifact-name.outputs.war-file}}
       run: |
+        ssh-agent -a $SSH_AUTH_SOCK > /dev/null
         for host in $DEPLOYMENT_HOSTS; do
           ./artemis-server-cli deploy $DEPLOYMENT_USER@$host -w $WAR_FILE -y
           sleep 20

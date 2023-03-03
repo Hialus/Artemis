@@ -59,7 +59,7 @@ function deploy {
     user_confirmation "About to start a deployment of WAR File $2 on remote server $1"
 
     # Upload WAR
-    scp -J jump@gateway.artemis.in.tum.de:2010 -o "StrictHostKeyChecking=no" $2 $1:~/artemis.war.new
+    scp -vvv -J jump@gateway.artemis.in.tum.de:2010 -o "StrictHostKeyChecking=no" $2 $1:~/artemis.war.new
 
     # Trigger Commands to replace and restart Artemis Application
     ssh -J jump@gateway.artemis.in.tum.de:2010 -o "StrictHostKeyChecking=no" $1 << COMMAND
