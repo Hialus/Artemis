@@ -184,13 +184,19 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
           GATEWAY_HOST: "${{ secrets.GATEWAY_HOST }}"
           GATEWAY_SSH_KEY: "${{ secrets.GATEWAY_SSH_KEY }}"
+          GATEWAY_HOST_PUBLIC_KEY: "${{ secrets.GATEWAY_HOST_PUBLIC_KEY }}"
           DEPLOYMENT_HOSTS: "${{ secrets.DEPLOYMENT_HOSTS }}"
           DEPLOYMENT_SSH_KEY: "${{ secrets.DEPLOYMENT_SSH_KEY }}"
+          DEPLOYMENT_HOST_PUBLIC_KEYS: "${{ secrets.DEPLOYMENT_HOST_PUBLIC_KEYS }}"
       run: |
           mkdir -p ~/.ssh
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           cat - <<< $GATEWAY_SSH_KEY > /tmp/gateway.key
           cat - <<< $DEPLOYMENT_SSH_KEY > /tmp/deployment.key
+          $GATEWAY_HOST_PUBLIC_KEY >> ~/.ssh/known_hosts
+          for host_key in $DEPLOYMENT_HOST_PUBLIC_KEYS; do
+            $host_key >> ~/.ssh/known_hosts
+          done
 
     - name: Deploy Artemis WAR artifact
       env:
