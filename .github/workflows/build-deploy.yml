@@ -134,7 +134,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - environment: artemistest5
+          - environment: Artemis Test 5
             url: https://artemistest5.ase.in.tum.de
     environment:
       url: ${{ matrix.url }}
@@ -178,46 +178,32 @@ jobs:
         wget ${{ env.RAW_URL }}/artemis-server-cli
         chmod +x artemis-server-cli
 
-    - name: Install OpenVPN
-      run: sudo apt-get --assume-yes --no-install-recommends install openvpn
-    # Fill config from Secret (https://tum.eduvpn.lrz.de/vpn-user-portal/configurations)
-    - name: Configure LRZ eduVPN
-      run: echo "${{ secrets.LRZ_OVPN_CONFIG }}" > lrz.ovpn
-    - name: Connect VPN
-      run: sudo openvpn --config "lrz.ovpn" --log "vpn.log" --daemon
-    - name: Wait for a VPN connection. Ping nas.ads.mwn.de (only accessible inside MWN)
-      run: until ping -c1 nas.ads.mwn.de; do sleep 2; done
-      timeout-minutes: 2
-
     # Configure SSH Key
     - name: Setup SSH Keys and known_hosts
       env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          GATEWAY_HOST: "${{ secrets.GATEWAY_HOST }}"
+          GATEWAY_SSH_KEY: "${{ secrets.GATEWAY_SSH_KEY }}"
           DEPLOYMENT_HOSTS: "${{ secrets.DEPLOYMENT_HOSTS }}"
-          SSH_PRIVATE_KEY: "${{ secrets.SSH_PRIVATE_KEY }}"
+          DEPLOYMENT_SSH_KEY: "${{ secrets.DEPLOYMENT_SSH_KEY }}"
       run: |
           mkdir -p ~/.ssh
-          for host in $DEPLOYMENT_HOSTS; do
-            ssh-keyscan $host >> ~/.ssh/known_hosts
-          done
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add - <<< $SSH_PRIVATE_KEY
+          cat $GATEWAY_SSH_KEY > /tmp/gateway.key
+          cat $DEPLOYMENT_SSH_KEY > /tmp/deployment.key
 
     - name: Deploy Artemis WAR artifact
       env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          GATEWAY_HOST: "${{ secrets.GATEWAY_HOST }}"
+          GATEWAY_SSH_KEY: "${{ secrets.GATEWAY_SSH_KEY }}"
+          GATEWAY_USER: "${{ secrets.DEPLOYMENT_USER }}"
           DEPLOYMENT_HOSTS: "${{ secrets.DEPLOYMENT_HOSTS }}"
-          DEPLOYMENT_USER: ${{ secrets.DEPLOYMENT_USER }}
+          DEPLOYMENT_SSH_KEY: "${{ secrets.DEPLOYMENT_SSH_KEY }}"
+          DEPLOYMENT_USER: "${{ secrets.DEPLOYMENT_USER }}"
           WAR_FILE: ./${{steps.artifact-name.outputs.war-file}}
       run: |
         for host in $DEPLOYMENT_HOSTS; do
           ./artemis-server-cli deploy $DEPLOYMENT_USER@$host -w $WAR_FILE -y
           sleep 20
         done
-
-    # Always disconnect from VPN
-    - name: Disconnect VPN
-      run: |
-        sudo killall openvpn
-        rm lrz.ovpn
-      if: always()
