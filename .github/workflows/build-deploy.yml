@@ -194,9 +194,7 @@ jobs:
           cat - <<< $GATEWAY_SSH_KEY > /tmp/gateway.key
           cat - <<< $DEPLOYMENT_SSH_KEY > /tmp/deployment.key
           $GATEWAY_HOST_PUBLIC_KEY >> ~/.ssh/known_hosts
-          for host_key in $DEPLOYMENT_HOST_PUBLIC_KEYS; do
-            $host_key >> ~/.ssh/known_hosts
-          done
+          $DEPLOYMENT_HOST_PUBLIC_KEYS >> ~/.ssh/known_hosts
 
     - name: Deploy Artemis WAR artifact
       env:
