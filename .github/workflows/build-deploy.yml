@@ -193,8 +193,8 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           cat - <<< $GATEWAY_SSH_KEY > /tmp/gateway.key
           cat - <<< $DEPLOYMENT_SSH_KEY > /tmp/deployment.key
-          $GATEWAY_HOST_PUBLIC_KEY >> ~/.ssh/known_hosts
-          $DEPLOYMENT_HOST_PUBLIC_KEYS >> ~/.ssh/known_hosts
+          cat - <<< $GATEWAY_HOST_PUBLIC_KEY >> ~/.ssh/known_hosts
+          cat - <<< $DEPLOYMENT_HOST_PUBLIC_KEYS >> ~/.ssh/known_hosts
 
     - name: Deploy Artemis WAR artifact
       env:
