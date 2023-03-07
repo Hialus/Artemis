@@ -204,17 +204,6 @@ jobs:
               }
               return "FALSE";
 
-    - name: Compute Branch Name
-      uses: actions/github-script@v6
-      id: compute-branch
-      with:
-          result-encoding: string
-          script: |
-              if (context.eventName === "pull_request") {
-                return context.ref.slice(10);
-              }
-              return "FALSE";
-
     # Download artemis-server-cli from GH without cloning the Repo
     - name: Fetch Artemis CLI
       run: |
@@ -241,9 +230,8 @@ jobs:
       env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
           TAG: ${{ steps.compute-tag.outputs.result }}
-          BRANCH: ${{ steps.compute-branch.outputs.result }}
       run: |
           for host in $DEPLOYMENT_HOSTS; do
-            ./artemis-server-cli deploy "$DEPLOYMENT_USER@$host" -g "$GATEWAY_USER@$GATEWAY_HOST" -t $TAG -p $BRANCH -c $DEPLOYMENT_FOLDER -y
+            ./artemis-server-cli deploy "$DEPLOYMENT_USER@$host" -g "$GATEWAY_USER@$GATEWAY_HOST" -t $TAG -p $GITHUB_HEAD_REF -c $DEPLOYMENT_FOLDER -y
             sleep 20
           done
