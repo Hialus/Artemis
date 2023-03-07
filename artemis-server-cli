@@ -260,7 +260,7 @@ function deploy_menu {
                 tag=$OPTARG
                 ;;
             p )
-                 branch=$OPTARG
+                branch=$OPTARG
                 ;;
             c )
                 directory=$OPTARG
