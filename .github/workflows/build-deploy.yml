@@ -244,6 +244,6 @@ jobs:
           BRANCH: ${{ steps.compute-branch.outputs.result }}
       run: |
           for host in $DEPLOYMENT_HOSTS; do
-            ./artemis-server-cli deploy "$DEPLOYMENT_USER@$host" -g "$GATEWAY_USER@$GATEWAY_HOST:2010" -t $TAG -p $BRANCH -c $DEPLOYMENT_FOLDER -y
+            ./artemis-server-cli deploy "$DEPLOYMENT_USER@$host" -g "$GATEWAY_USER@$GATEWAY_HOST" -t $TAG -p $BRANCH -c $DEPLOYMENT_FOLDER -y
             sleep 20
           done

@@ -61,7 +61,7 @@ function backup {
 function deploy {
     user_confirmation "About to start a deployment of PR $3 ($4) on remote server $1 using gateway server $2"
 
-    ssh -J $2 -o "StrictHostKeyChecking=no" $1 << COMMAND
+    ssh -J "$2" -o "StrictHostKeyChecking=no" "$1" << COMMAND
 cd $5
 docker compose down artemis-app
 rm -rf Artemis
