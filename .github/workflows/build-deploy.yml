@@ -146,6 +146,9 @@ jobs:
 
     environment:
       name: ${{ matrix.environment }}
+      url: ${{ matrix.url }}
+      
+    env:
       DEPLOYMENT_USER: ${{ matrix.user }}
       DEPLOYMENT_HOSTS: ${{ matrix.hosts }}
       DEPLOYMENT_FOLDER: ${{ matrix.folder }}
@@ -153,6 +156,7 @@ jobs:
       GATEWAY_USER: "jump"
       GATEWAY_HOST: "gateway.artemis.in.tum.de:2010"
       GATEWAY_HOST_PUBLIC_KEY: "[gateway.artemis.in.tum.de]:2010 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKtTLiKRILjKZ+Qg4ReWKsG7mLDXkzHfeY5nalSQUNQ4"
+
     steps:
     - name: Check "lock:${{ matrix.environment }}" label
       uses: actions/github-script@v6
