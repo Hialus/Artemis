@@ -218,7 +218,9 @@ jobs:
     # Download artemis-server-cli from GH without cloning the Repo
     - name: Fetch Artemis CLI
       run: |
+        echo ${{ env.RAW_URL }}
         wget ${{ env.RAW_URL }}/artemis-server-cli
+        cat artemis-server-cli
         chmod +x artemis-server-cli
 
     # Configure SSH Key

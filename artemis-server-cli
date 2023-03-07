@@ -289,25 +289,25 @@ function deploy_menu {
     shift $((OPTIND -1))
 
     if [ -z $gateway ] || [ ! -f $gateway ]; then
-        printf "Require Path to WAR file to perform deployment.\n\n" 1>&2
+        printf "Require gateway to perform deployment.\n\n" 1>&2
         backup_help
         exit 1
     fi
 
     if [ -z $tag ] || [ ! -f $tag ]; then
-        printf "Require Path to WAR file to perform deployment.\n\n" 1>&2
+        printf "Require docker tag to perform deployment.\n\n" 1>&2
         backup_help
         exit 1
     fi
 
     if [ -z $branch ] || [ ! -f $branch ]; then
-        printf "Require Path to WAR file to perform deployment.\n\n" 1>&2
+        printf "Require branch name to perform deployment.\n\n" 1>&2
         backup_help
         exit 1
     fi
 
     if [ -z $directory ] || [ ! -f $directory ]; then
-        printf "Require Path to WAR file to perform deployment.\n\n" 1>&2
+        printf "Require deployment directory to perform deployment.\n\n" 1>&2
         backup_help
         exit 1
     fi
