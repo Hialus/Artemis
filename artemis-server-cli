@@ -244,7 +244,7 @@ function deploy_menu {
     local filesystem=false
 
     local OPTIND
-    while getopts ":hygtpc:bdf" opt; do
+    while getopts ":hyg:t:p:c:bdf" opt; do
         case ${opt} in
             h )
                 deploy_help
@@ -288,25 +288,25 @@ function deploy_menu {
     fi
     shift $((OPTIND -1))
 
-    if [ -z $gateway ] || [ ! -f $gateway ]; then
+    if [ -z $gateway ]; then
         printf "Require gateway to perform deployment.\n\n" 1>&2
         backup_help
         exit 1
     fi
 
-    if [ -z $tag ] || [ ! -f $tag ]; then
+    if [ -z $tag ]; then
         printf "Require docker tag to perform deployment.\n\n" 1>&2
         backup_help
         exit 1
     fi
 
-    if [ -z $branch ] || [ ! -f $branch ]; then
+    if [ -z $branch ]; then
         printf "Require branch name to perform deployment.\n\n" 1>&2
         backup_help
         exit 1
     fi
 
-    if [ -z $directory ] || [ ! -f $directory ]; then
+    if [ -z $directory ]; then
         printf "Require deployment directory to perform deployment.\n\n" 1>&2
         backup_help
         exit 1
