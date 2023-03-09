@@ -134,7 +134,18 @@ jobs:
     strategy:
       matrix:
         include:
-          - environment: Artemis Test 5
+        -   environment: Artemis Test 1 (Atlassian, MySQL)
+            lock_label: Artemis Test 1
+            url: https://artemis-test1.artemis.cit.tum.de
+            user: deployment
+            hosts: artemis-test1.artemis.cit.tum.de
+            folder: /opt/artemis
+            host_keys: |
+                artemis-test1.artemis.cit.tum.de ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDS+lFrN7hvzFjESxSQkmLbBdra9dWo33izxLRO2x5oTQwcbZA66Y3cQungIV460aQHwH+K0ALQuEc5EA7LegfFXo//t3kqXEALf0xRkO5tLnJEBpwnjpiOj8GFVIR8XOopKHf3zLo7/rmCPmdN0TKKigw9PcowB3Nf9TlpXvVtpkNTqnjwxfsLqvVjTf+8ji48Xe8zOhAH4zyJEc1KFM7XNdYYJPUctQyOoF+9QrTEW2GLYRkb2IqL8RDd09riUrjtsQJdoK21ATPC07j6XqGCgZxZQfmq4NlqEg2euQt45l0ZkVp3sQG70U0NkwKsLLhABWOzKDWvix7mJ/YDXCkk4Q8Badus1vIBAZYuTATfsEwXnQEnKTl8i4l7CE6U4PZLhwOgxcLBU9E3YKLjCsp8wfEV0n/wyoxXKUSH7Lb0jPQ4JMVUgNT5Rkdt0RE3YMWxVLrQNs6u33m2LrXt3lmiZsGpFa08RcjnSdFtHonL/CkwU00kckoMwRPgUniJKmM=
+                artemis-test1.artemis.cit.tum.de ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMk4f5/x4grLMOY9jQCp3SfSjF81iWYRCbXJHBMWzG3TbQq9d2zW8bGCak5TGwPCDnjfBPRRSF57LZJlNaf3wPE=
+                artemis-test1.artemis.cit.tum.de ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBGzlZUARYQBdq85FtCe4IALac1dSWoNsvQZmeCjPmS/
+
+        -   environment: Artemis Test 5
             lock_label: Artemis Test 5
             url: https://artemistest5.ase.in.tum.de
             user: bamboo

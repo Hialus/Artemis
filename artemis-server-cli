@@ -61,11 +61,12 @@ function backup {
 function deploy {
     user_confirmation "About to start a deployment of PR $3 ($4) on remote server $1 using gateway server $2"
 
+#git clone https://github.com/Hialus/Artemis.git -b $4 Artemis
     ssh -J "$2" -o "StrictHostKeyChecking=no" "$1" << COMMAND
 cd $5
 docker compose down artemis-app
 rm -rf Artemis
-git clone https://github.com/Hialus/Artemis.git -b $4 Artemis
+git clone https://github.com/ls1intum/Artemis.git -b "develop-deployment-wg" Artemis
 sed -i 's/ARTEMIS_TAG=".*"/ARTEMIS_TAG="$3"/g' .env
 docker compose up -d artemis-app
 COMMAND
