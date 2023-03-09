@@ -73,7 +73,7 @@ jobs:
         asset_content_type: application/x-webarchive
 
   docker:
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'ls1intum/Artemis' }}
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'Hialus/Artemis' }}
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -119,8 +119,8 @@ jobs:
       env:
         TAG: ${{ steps.compute-tag.outputs.result }}
       run: |
-        docker tag artemis ghcr.io/ls1intum/artemis:$TAG
-        docker push ghcr.io/ls1intum/artemis:$TAG
+        docker tag artemis ghcr.io/hialus/artemis:$TAG
+        docker push ghcr.io/hialus/artemis:$TAG
       if: ${{ steps.compute-tag.outputs.result != 'FALSE' }}
 
     # TODO: Push to Docker Hub (develop + tag)
@@ -129,16 +129,45 @@ jobs:
 
   deploy:
     if: ${{ github.event_name == 'pull_request' }}
-    needs: build
+    needs: docker
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - environment: artemistest5
+        -   environment: Artemis Test 1 (Atlassian, MySQL)
+            lock_label: Artemis Test 1
+            url: https://artemis-test1.artemis.cit.tum.de
+            user: deployment
+            hosts: artemis-test1.artemis.cit.tum.de
+            folder: /opt/artemis
+            host_keys: |
+                artemis-test1.artemis.cit.tum.de ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDS+lFrN7hvzFjESxSQkmLbBdra9dWo33izxLRO2x5oTQwcbZA66Y3cQungIV460aQHwH+K0ALQuEc5EA7LegfFXo//t3kqXEALf0xRkO5tLnJEBpwnjpiOj8GFVIR8XOopKHf3zLo7/rmCPmdN0TKKigw9PcowB3Nf9TlpXvVtpkNTqnjwxfsLqvVjTf+8ji48Xe8zOhAH4zyJEc1KFM7XNdYYJPUctQyOoF+9QrTEW2GLYRkb2IqL8RDd09riUrjtsQJdoK21ATPC07j6XqGCgZxZQfmq4NlqEg2euQt45l0ZkVp3sQG70U0NkwKsLLhABWOzKDWvix7mJ/YDXCkk4Q8Badus1vIBAZYuTATfsEwXnQEnKTl8i4l7CE6U4PZLhwOgxcLBU9E3YKLjCsp8wfEV0n/wyoxXKUSH7Lb0jPQ4JMVUgNT5Rkdt0RE3YMWxVLrQNs6u33m2LrXt3lmiZsGpFa08RcjnSdFtHonL/CkwU00kckoMwRPgUniJKmM=
+                artemis-test1.artemis.cit.tum.de ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMk4f5/x4grLMOY9jQCp3SfSjF81iWYRCbXJHBMWzG3TbQq9d2zW8bGCak5TGwPCDnjfBPRRSF57LZJlNaf3wPE=
+                artemis-test1.artemis.cit.tum.de ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBGzlZUARYQBdq85FtCe4IALac1dSWoNsvQZmeCjPmS/
+
+        -   environment: Artemis Test 5
+            lock_label: Artemis Test 5
             url: https://artemistest5.ase.in.tum.de
+            user: bamboo
+            hosts: artemistest5.ase.in.tum.de
+            folder: /opt/artemis
+            host_keys: |
+                vmbhatotia2.in.tum.de ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID9rUhkfEds+gDdJSGBmmAn1tvD7UjeTwrLU39ACqSqD
+                vmbhatotia2.in.tum.de ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJnqub476unejWdlhJV+D3kN0gmQor6bAa+LKgPy3ad4/NGP+dNACkj41gRwCcihEQnb7iwVhBM5Svc4uOoUfHs="
+
     environment:
-      url: ${{ matrix.url }}
       name: ${{ matrix.environment }}
+      url: ${{ matrix.url }}
+
+    env:
+      DEPLOYMENT_USER: ${{ matrix.user }}
+      DEPLOYMENT_HOSTS: ${{ matrix.hosts }}
+      DEPLOYMENT_FOLDER: ${{ matrix.folder }}
+      DEPLOYMENT_HOST_PUBLIC_KEYS: ${{ matrix.host_keys }}
+      GATEWAY_USER: "jump"
+      GATEWAY_HOST: "gateway.artemis.in.tum.de:2010"
+      GATEWAY_HOST_PUBLIC_KEY: "[gateway.artemis.in.tum.de]:2010 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKtTLiKRILjKZ+Qg4ReWKsG7mLDXkzHfeY5nalSQUNQ4"
+
     steps:
     - name: Check "lock:${{ matrix.environment }}" label
       uses: actions/github-script@v6
@@ -148,76 +177,72 @@ jobs:
           const opts = github.rest.issues.listForRepo.endpoint.merge({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            labels: ['lock:${{ matrix.environment }}']
+            labels: ['lock:${{ matrix.lock_label }}']
           })
           const issues = await github.paginate(opts)
           if (issues.length == 1 && (!context.issue || issues[0].number != context.issue.number)) {
             core.setFailed(`Testserver "${{ matrix.environment }}" is already in use by PR #${issues[0].number}.`);
           } else if (issues.length > 1) {
-            core.setFailed('Testserver "${{ matrix.environment }}" is already in use by multiple PRs. Check PRs with label "lock:${{ matrix.environment }}"!');
+            core.setFailed('Testserver "${{ matrix.environment }}" is already in use by multiple PRs. Check PRs with label "lock:${{ matrix.lock_label }}"!');
           } else if (context.issue && context.issue.number) {
             await github.rest.issues.addLabels({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              labels: ['lock:${{ matrix.environment }}']
+              labels: ['lock:${{ matrix.lock_label }}']
             })
           }
 
-    - name: Download Artifact
-      uses: actions/download-artifact@v3
+    - name: Compute Tag
+      uses: actions/github-script@v6
+      id: compute-tag
       with:
-        name: Artemis.war
-    - name: Store Artifact Name
-      id: artifact-name
-      run: echo "::set-output name=war-file::$(ls)"
+          result-encoding: string
+          script: |
+              if (context.eventName === "pull_request") {
+                return "pr-" + context.issue.number;
+              }
+              if (context.eventName === "release") {
+                return "latest";
+              }
+              if (context.eventName === "push") {
+                if (context.ref.startsWith("refs/tags/")) {
+                  return context.ref.slice(10);
+                }
+                if (context.ref === "refs/heads/develop") {
+                  return "develop";
+                }
+              }
+              return "FALSE";
 
     # Download artemis-server-cli from GH without cloning the Repo
     - name: Fetch Artemis CLI
       run: |
+        echo ${{ env.RAW_URL }}
         wget ${{ env.RAW_URL }}/artemis-server-cli
+        cat artemis-server-cli
         chmod +x artemis-server-cli
-
-    - name: Install OpenVPN
-      run: sudo apt-get --assume-yes --no-install-recommends install openvpn
-    # Fill config from Secret (https://tum.eduvpn.lrz.de/vpn-user-portal/configurations)
-    - name: Configure LRZ eduVPN
-      run: echo "${{ secrets.LRZ_OVPN_CONFIG }}" > lrz.ovpn
-    - name: Connect VPN
-      run: sudo openvpn --config "lrz.ovpn" --log "vpn.log" --daemon
-    - name: Wait for a VPN connection. Ping nas.ads.mwn.de (only accessible inside MWN)
-      run: until ping -c1 nas.ads.mwn.de; do sleep 2; done
-      timeout-minutes: 2
 
     # Configure SSH Key
     - name: Setup SSH Keys and known_hosts
       env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-          DEPLOYMENT_HOSTS: "${{ secrets.DEPLOYMENT_HOSTS }}"
-          SSH_PRIVATE_KEY: "${{ secrets.SSH_PRIVATE_KEY }}"
+          GATEWAY_SSH_KEY: "${{ secrets.GATEWAY_SSH_KEY }}"
+          DEPLOYMENT_SSH_KEY: "${{ secrets.DEPLOYMENT_SSH_KEY }}"
       run: |
           mkdir -p ~/.ssh
-          for host in $DEPLOYMENT_HOSTS; do
-            ssh-keyscan $host >> ~/.ssh/known_hosts
-          done
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add - <<< $SSH_PRIVATE_KEY
+          ssh-add - <<< $GATEWAY_SSH_KEY
+          ssh-add - <<< $DEPLOYMENT_SSH_KEY
+          cat - <<< $GATEWAY_HOST_PUBLIC_KEY >> ~/.ssh/known_hosts
+          cat - <<< $DEPLOYMENT_HOST_PUBLIC_KEYS >> ~/.ssh/known_hosts
 
-    - name: Deploy Artemis WAR artifact
+    - name: Deploy Artemis with Docker
       env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-          DEPLOYMENT_HOSTS: "${{ secrets.DEPLOYMENT_HOSTS }}"
-          DEPLOYMENT_USER: ${{ secrets.DEPLOYMENT_USER }}
-          WAR_FILE: ./${{steps.artifact-name.outputs.war-file}}
+          TAG: ${{ steps.compute-tag.outputs.result }}
       run: |
-        for host in $DEPLOYMENT_HOSTS; do
-          ./artemis-server-cli deploy $DEPLOYMENT_USER@$host -w $WAR_FILE -y
-          sleep 20
-        done
-
-    # Always disconnect from VPN
-    - name: Disconnect VPN
-      run: |
-        sudo killall openvpn
-        rm lrz.ovpn
-      if: always()
+          for host in $DEPLOYMENT_HOSTS; do
+            ./artemis-server-cli deploy "$DEPLOYMENT_USER@$host" -g "$GATEWAY_USER@$GATEWAY_HOST" -t $TAG -p $GITHUB_HEAD_REF -c $DEPLOYMENT_FOLDER -y
+            sleep 20
+          done

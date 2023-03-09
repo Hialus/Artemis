@@ -53,27 +53,22 @@ function backup {
 
 # Function: Perform Deployment to Server
 #
-# @param host
-# @param war location
+# @param deployment host
+# @param gateway host
+# @param pr tag
+# @param pr branch
+# @param deployment directory
 function deploy {
-    user_confirmation "About to start a deployment of WAR File $2 on remote server $1"
+    user_confirmation "About to start a deployment of PR $3 ($4) on remote server $1 using gateway server $2"
 
-    # Upload WAR
-    scp $2 $1:~/artemis.war.new
-
-    # Trigger Commands to replace and restart Artemis Application
-    ssh $1 << COMMAND
-chmod +x artemis.war.new
-sudo mv ~/artemis.war.new /opt/artemis/artemis.war.new
-
-sudo rm /opt/artemis/artemis.war.old
-
-sudo systemctl stop artemis
-
-sudo mv /opt/artemis/artemis.war /opt/artemis/artemis.war.old
-sudo mv /opt/artemis/artemis.war.new /opt/artemis/artemis.war
-
-sudo systemctl start artemis
+#git clone https://github.com/Hialus/Artemis.git -b $4 Artemis
+    ssh -J "$2" -o "StrictHostKeyChecking=no" "$1" << COMMAND
+cd $5
+docker compose down artemis-app
+rm -rf Artemis
+git clone https://github.com/ls1intum/Artemis.git -b "develop-deployment-wg" Artemis
+sed -i 's/ARTEMIS_TAG=".*"/ARTEMIS_TAG="$3"/g' .env
+docker compose up -d artemis-app
 COMMAND
 }
 
@@ -241,13 +236,16 @@ function deploy_menu {
         exit 1
     fi
 
-    local war=''
+    local gateway=''
+    local tag=''
+    local branch=''
+    local directory=''
     local backup=false
     local database=false
     local filesystem=false
 
     local OPTIND
-    while getopts ":hyw:bdf" opt; do
+    while getopts ":hyg:t:p:c:bdf" opt; do
         case ${opt} in
             h )
                 deploy_help
@@ -256,8 +254,17 @@ function deploy_menu {
             y )
                 interactive=false
                 ;;
-            w )
-                war=$OPTARG
+            g )
+                gateway=$OPTARG
+                ;;
+            t )
+                tag=$OPTARG
+                ;;
+            p )
+                branch=$OPTARG
+                ;;
+            c )
+                directory=$OPTARG
                 ;;
             b )
                 backup=true
@@ -282,8 +289,26 @@ function deploy_menu {
     fi
     shift $((OPTIND -1))
 
-    if [ -z $war ] || [ ! -f $war ]; then
-        printf "Require Path to WAR file to perform deployment.\n\n" 1>&2
+    if [ -z $gateway ]; then
+        printf "Require gateway to perform deployment.\n\n" 1>&2
+        backup_help
+        exit 1
+    fi
+
+    if [ -z $tag ]; then
+        printf "Require docker tag to perform deployment.\n\n" 1>&2
+        backup_help
+        exit 1
+    fi
+
+    if [ -z $branch ]; then
+        printf "Require branch name to perform deployment.\n\n" 1>&2
+        backup_help
+        exit 1
+    fi
+
+    if [ -z $directory ]; then
+        printf "Require deployment directory to perform deployment.\n\n" 1>&2
         backup_help
         exit 1
     fi
@@ -292,7 +317,7 @@ function deploy_menu {
         backup $server $database $filesystem
     fi
 
-    deploy $server $war
+    deploy $server $gateway $tag $branch $directory
 }
 
 # Function: Display Logs Subcommand Menu
