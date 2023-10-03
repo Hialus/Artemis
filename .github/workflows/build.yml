@@ -9,8 +9,6 @@ on:
     - 'LICENSE'
     - 'SECURITY.md'
     - 'docs/**'
-    - '.github/**'
-    - '!.github/workflows/build.yml'
   push:
     branches:
     - develop
@@ -24,8 +22,6 @@ on:
     - 'LICENSE'
     - 'SECURITY.md'
     - 'docs/**'
-    - '.github/**'
-    - '!.github/workflows/build.yml'
   release:
     types:
     - created
