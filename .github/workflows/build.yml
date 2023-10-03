@@ -71,7 +71,6 @@ jobs:
 
   docker:
     name: Build and Push Docker Image
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'ls1intum/Artemis' }}
     runs-on: ubuntu-latest
     steps:
     - name: Compute Tag
