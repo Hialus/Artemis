@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       labels: ${{ steps.process.outputs.labels }}
+      badges: ${{ steps.process.outputs.badges }}
     steps:
       - name: Process Labels
         id: process
@@ -40,6 +41,7 @@ jobs:
             console.log('Labels to process:', labelsToProcess);
 
             // Use the labelsToRemove array to remove the matching labels
+            core.setOutput('badges', JSON.stringify(labelsToProcess));
             core.setOutput('labels', JSON.stringify(labelsToRemove));
 
 
@@ -60,20 +62,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        label: ${{ fromJson(needs.process_labels.outputs.labels) }}
+        badge: ${{ fromJson(needs.process_labels.outputs.badges) }}
 
     steps:
       - name: Echo
         run: |
-          echo ${{ needs.process_labels.outputs.labels }}
-          echo ${{ fromJson(needs.process_labels.outputs.labels) }}
-          echo ${{ matrix.label }} 
+          echo ${{ needs.process_labels.outputs.badges }}
+          echo ${{ fromJson(needs.process_labels.outputs.badges) }}
+          echo ${{ matrix.badge }} 
           echo ${{ env.GITHUB_BASE_REF }}
       - name: Update badge
         uses: RubbaBoy/BYOB@v1.3.0
         with:
-          NAME: ${{ matrix.label }}
-          LABEL: ${{ matrix.label }}
+          NAME: ${{ matrix.badge }}
+          LABEL: ${{ matrix.badge }}
           STATUS: ${{ env.GITHUB_BASE_REF }}
           COLOR: red
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
