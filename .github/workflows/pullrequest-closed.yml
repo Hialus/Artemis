@@ -63,11 +63,17 @@ jobs:
         label: ${{ fromJson(needs.process_labels.outputs.labels) }}
 
     steps:
+      - name: Echo
+        run: |
+          echo ${{ needs.process_labels.outputs.labels }}
+          echo ${{ fromJson(needs.process_labels.outputs.labels) }}
+          echo ${{ matrix.label }} 
+          echo ${{ env.GITHUB_BASE_REF }}
       - name: Update badge
         uses: RubbaBoy/BYOB@v1.3.0
         with:
           NAME: ${{ matrix.label }}
-          LABEL: ${{ matrix.environment }}
+          LABEL: ${{ matrix.label }}
           STATUS: ${{ env.GITHUB_BASE_REF }}
           COLOR: red
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
