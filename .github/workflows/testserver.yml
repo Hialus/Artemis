@@ -377,7 +377,7 @@ jobs:
         with:
           NAME: ${{ matrix.label-identifier }}
           LABEL: ${{ matrix.environment }}
-          STATUS: $GITHUB_BASE_REF
+          STATUS: ${{ env.GITHUB_BASE_REF }}
           COLOR: green
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
