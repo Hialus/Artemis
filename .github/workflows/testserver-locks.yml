@@ -16,13 +16,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           labels: |
-            lock:artemis-test1
             lock:artemis-test2
-            lock:artemis-test3
-            lock:artemis-test4
-            lock:artemis-test5
-            lock:artemis-test6
-            lock:artemis-test7
-            lock:artemis-test8
-            lock:artemis-test9
-            lock:artemis-test10
