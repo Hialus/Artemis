@@ -40,7 +40,7 @@ jobs:
             console.log('Labels to process:', labelsToProcess);
 
             // Use the labelsToRemove array to remove the matching labels
-            core.setOutput('labels', '["' + labelsToRemove.join('", "') + '"]');
+            core.setOutput('labels', toJson(labelsToRemove));
 
 
   remove_labels:
