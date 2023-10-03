@@ -130,7 +130,7 @@ jobs:
         platforms: linux/amd64,linux/arm64
         file: ./docker/artemis/Dockerfile
         context: .
-        tags: ghcr.io/ls1intum/artemis:${{ steps.compute-tag.outputs.result }}
+        tags: ghcr.io/hialus/artemis:${{ steps.compute-tag.outputs.result }}
         push: true
 
     # TODO: Push to Docker Hub (develop + tag)
