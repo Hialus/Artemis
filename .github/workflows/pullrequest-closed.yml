@@ -48,6 +48,7 @@ jobs:
   remove_labels:
     needs: process_labels
     runs-on: ubuntu-latest
+    if: ${{ needs.process_labels.outputs.labels != '' }}
 
     steps:
       - name: Remove Labels
@@ -63,6 +64,7 @@ jobs:
     strategy:
       matrix:
         badge: ${{ fromJson(needs.process_labels.outputs.badges) }}
+    if: ${{ needs.process_labels.outputs.labels != '' }}
 
     steps:
       - name: Echo
