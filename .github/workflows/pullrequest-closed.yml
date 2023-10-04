@@ -42,7 +42,7 @@ jobs:
 
             // Use the labelsToRemove array to remove the matching labels
             core.setOutput('badges', JSON.stringify(labelsToProcess));
-            core.setOutput('labels', JSON.stringify(labelsToRemove));
+            core.setOutput('labels', labelsToRemove.join(', '));
 
 
   remove_labels:
