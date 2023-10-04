@@ -53,7 +53,7 @@ jobs:
       - name: Remove Labels
         uses: actions-ecosystem/action-remove-labels@v1
         with:
-          labels: ${{ fromJSON(needs.process_labels.outputs.labels) }}
+          labels: ${{ needs.process_labels.outputs.labels }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
