@@ -72,13 +72,13 @@ jobs:
           echo ${{ needs.process_labels.outputs.badges }}
           echo ${{ fromJson(needs.process_labels.outputs.badges) }}
           echo ${{ matrix.badge }} 
-          echo ${{ github.base_ref }}
+          echo ${{ github.event.pull_request.head.ref }}
       - name: Update badge
         uses: RubbaBoy/BYOB@v1.3.0
         with:
           NAME: "artemis-test${{ matrix.badge }}"
           LABEL: "artemis-test${{ matrix.badge }}.artemis.cit.tum.de"
-          STATUS: ${{ github.event.pull_request.base.ref }}
+          STATUS: ${{ github.event.pull_request.head.ref }}
           COLOR: green
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
