@@ -72,7 +72,7 @@ jobs:
           echo ${{ needs.process_labels.outputs.badges }}
           echo ${{ fromJson(needs.process_labels.outputs.badges) }}
           echo ${{ matrix.badge }} 
-          echo ${{ github.event.pull_request.ref }}
+          echo ${{ github.base_ref }}
       - name: Update badge
         uses: RubbaBoy/BYOB@v1.3.0
         with:
