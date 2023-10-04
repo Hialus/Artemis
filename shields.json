@@ -1,1 +1,1 @@
-{"artemis-test1":{"label":"artemis-test1.artemis.cit.tum.de","status":"test-testserver-changes","color":"green"},"artemis-test2":{"label":"artemis-test2.artemis.cit.tum.de","status":"test-testserver-changes","color":"red"}}
+{"artemis-test1":{"label":"artemis-test1.artemis.cit.tum.de","status":"develop","color":"green"},"artemis-test2":{"label":"artemis-test2.artemis.cit.tum.de","status":"test-testserver-changes","color":"red"}}
