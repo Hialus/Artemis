@@ -13,19 +13,20 @@ jobs:
     steps:
       - name: Set up environment
         id: env
-        run: |
-          LABEL="${{ github.event.label.name }}"
-          BADGE="${LABEL#lock:artemis-test}"
-          echo "::set-env name=BADGE::$BADGE"
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const labelName = context.payload.label.name;
+            const badge = labelName.replace(/^lock:artemis-test/, '');
+            core.setOutput('BADGE', badge);
         env:
-          LABEL: ${{ github.event.label.name }}
-        shell: bash
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update badge
         uses: RubbaBoy/BYOB@v1.3.0
         with:
-          NAME: "artemis-test${{ env.BADGE }}"
-          LABEL: "artemis-test${{ env.BADGE }}.artemis.cit.tum.de"
+          NAME: "artemis-test${{ steps.env.outputs.BADGE }}"
+          LABEL: "artemis-test${{ steps.env.outputs.BADGE }}.artemis.cit.tum.de"
           STATUS: ${{ github.event.pull_request.head.ref }}
           COLOR: green
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
