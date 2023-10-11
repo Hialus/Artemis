@@ -1,0 +1,31 @@
+name: Update Badges on Label Removal
+
+on:
+  pull_request_target:
+    types:
+      - unlabeled
+
+jobs:
+  update_badges:
+    name: Update badges
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up environment
+        id: env
+        run: |
+          LABEL="${{ github.event.label.name }}"
+          BADGE="${LABEL#lock:artemis-test}"
+          echo "::set-env name=BADGE::$BADGE"
+        env:
+          LABEL: ${{ github.event.label.name }}
+        shell: bash
+
+      - name: Update badge
+        uses: RubbaBoy/BYOB@v1.3.0
+        with:
+          NAME: "artemis-test${{ env.BADGE }}"
+          LABEL: "artemis-test${{ env.BADGE }}.artemis.cit.tum.de"
+          STATUS: ${{ github.event.pull_request.head.ref }}
+          COLOR: green
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
