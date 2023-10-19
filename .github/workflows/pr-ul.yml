@@ -14,6 +14,7 @@ jobs:
       - name: Set up environment
         id: env
         uses: actions/github-script@v6
+        if: startsWith(github.event.label.name, 'lock:artemis-test')
         with:
           script: |
             const labelName = context.payload.label.name;
@@ -24,6 +25,7 @@ jobs:
 
       - name: Update badge
         uses: RubbaBoy/BYOB@v1.3.0
+        if: startsWith(github.event.label.name, 'lock:artemis-test')
         with:
           NAME: "artemis-test${{ steps.env.outputs.BADGE }}"
           LABEL: "artemis-test${{ steps.env.outputs.BADGE }}.artemis.cit.tum.de"
