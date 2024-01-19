@@ -1,7 +1,7 @@
 {
     "artemis-test1": {
         "label": "artemis-test1.artemis.cit.tum.de",
-        "status": "testing2",
+        "status": "testing",
         "color": "yellow"
     },
     "artemis-test2": {
